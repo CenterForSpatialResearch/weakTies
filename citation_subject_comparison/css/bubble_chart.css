@@ -1,0 +1,116 @@
+@font-face{
+    font-family:stanhope;
+      src: url(StanhopeRR-Medium.otf);
+}
+    body{
+        font-family:stanhope;
+        font-size:14px;
+    }
+a, a:visited, a:active {
+  color: #444;
+}
+#title{
+    font-size:48px;
+    padding:3px;
+    letter-spacing:1px;
+}
+.container {
+  max-width: 100%;
+  margin: auto;
+}
+
+.button {
+  min-width: 130px;
+  padding: 4px 5px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 13px;
+  border-right: 1px solid #000000;
+  text-decoration: none;
+}
+
+.button.active {
+  background: #fff;
+  color: #00aeef;
+}
+
+.keyColor{
+    width:10px;
+    height:10px;
+    border-radius:10px;
+    background-color:black;
+    display:inline-block;
+}
+#key{
+    margin:10px;
+}
+#bothKey{
+    background-color:#fff200;
+}
+#citingKey{
+    background-color:#ec008c;
+}
+#topicKey{
+    background-color:#00aeef;
+}
+#emptyKey{
+    background-color:#ffffff;
+    border:1px solid black;
+}
+#maxKey{
+    background-color:#000000;
+    width:40px;
+    height:40px;
+    border-radius:50px;
+}
+#minKey{
+    background-color:#000000;
+    width:8px;
+    height:8px;
+}
+#vis {
+  width:100%;
+  height:100%;
+  clear: both;
+  margin-bottom: 10px;
+  z-index:-1;
+  overflow:auto;
+}
+
+#toolbar {
+  margin-top: 10px;
+}
+
+.year {
+  font-size: 21px;
+  fill: #aaa;
+  cursor: default;
+}
+
+.tooltip {
+	position: absolute;
+	top: 100px;
+	left: 100px;
+  -moz-border-radius:5px;
+	border-radius: 5px;
+  border: 2px solid #000;
+  background: #fff;
+	opacity: .9;
+  color: black;
+	padding: 10px;
+	width: 300px;
+	font-size: 12px;
+	z-index: 10;
+}
+
+.tooltip .title {
+	font-size: 13px;
+}
+
+.tooltip .name {
+  font-weight:bold;
+}
+
+.footer {
+  text-align: center;
+}

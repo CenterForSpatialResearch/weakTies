@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <title>citation timeline</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script type="text/javascript" src="d3.v4.min.js"></script>
+<!--
+    <script type="text/javascript" src="d3-tip.js"></script>
+-->
+  
+    
+    <style>
+        @font-face {
+            font-family: "stan";
+                src: url(StanhopeRR-Medium.otf) format("opentype");
+        }
+        .d3-tip{
+            padding:10px;
+            font-size:11px;
+            color:rgba(0,0,0,1);;
+            background-color:rgba(255,255,255,.8);
+        }
+        .yAxisLong{
+            stroke-dasharray: 1 3; 
+        }
+        body{
+            font-family:stan;
+            font-size:11px;
+        }
+        #title{
+            width:50%;
+            margin-left:80px;
+            padding:10px;
+            display:inline-block;
+            vertical-align:top;
+            min-width:100px;
+            font-size:24px;
+            letter-spacing:1px;
+        }
+        #info{
+            font-size:11px;
+            padding:3px;
+            margin-left:80px;
+        }
+        #chart1{
+            position:absolute;
+            top:0px;
+            left:0px;
+            padding:20px;
+        }
+    </style>
+</head>
+<body>
+  
+   <div id="title">
+      Business Economics
+   </div>
+   <div id="info">
+   </div>
+    <div id="chart1">
+    </div>
+   
+   <div id="smallCharts"></div>
+
+
+
+<script>
+
+    var fields = ["computer science","sociology","behavioral science","social science and other topics","psychology","business economics","other fields"];
+    
+    var colors = {
+         "computer science":"#ec008c",
+        "sociology":"#00aeef",
+        "behavioral science":"#fff200",
+        "social science and other topics":"#3cb44b",
+        "psychology":"#f7941d",
+        "business economics":"#e6194B",
+        "other fields":"#a9a9a9"
+        
+    }
+    
+    
+    d3.csv("businessEconomics.csv",function(data){
+        var width = 700
+        var height = 100
+        var padding = 100
+        var svg = d3.select("#chart1").append("svg").attr("width",width+padding).attr("height",height+padding)
+        var x = d3.scaleLinear()
+                .domain([1960,2020])
+                .rangeRound([0, width])
+        
+        //x.domain(data.map(function(d) { return d.year; }))
+        
+        var y = d3.scaleLinear()
+            .range([height, 0]);
+        //y.domain([0, d3.max(data, function(d) { return d.total; })])
+        y.domain([0, 150])
+        
+        var z = d3.scaleOrdinal().range(["#f7941d","#ec008c","#fff200","#00aeef"])
+            .domain(fields)
+        var stack = d3.stack();
+    var tooltipText =""
+        
+        
+      //  svg.selectAll(".key")
+      //  .data(Object.keys(colors))
+      //  .enter()
+      //  .append("rect")
+      //  .attr("width",10)
+      //  .attr("height",10)
+      //  .attr("x",110)
+      //  .attr("y",function(d,i){
+      //      console.log(d)
+      //      return i*15+112
+      //  })
+      //  .attr("fill",function(d){
+      //      return colors[d]
+      //  })
+      //  
+      //  svg.selectAll(".keytext")
+      //  .data(Object.keys(colors))
+      //  .enter()
+      //  .append("text")
+      //  .attr("x",125)
+      //  .attr("y",function(d,i){
+      //      return i*15+120
+      //  })
+      //  .text(function(d){
+      //      return d
+      //  })
+    
+        
+      svg.selectAll(".serie")
+          //the keys for the stack are the columns minus the first column, which is removed
+          //using the "slice" method
+          .data(stack.keys(data.columns.slice(2))(data))
+          // each age series is given it's own g
+          .enter().append("g")
+            .attr("class", function(d){
+                return d.key.split(" ").join("_")
+            })
+        .attr("fill",function(d,i){
+            return "black"
+            return colors[d.key]
+        })
+        .on("mouseover",function(d,i){
+            tooltipText = d.key
+        })
+          .selectAll("rect")
+          .data(function(d,i) { 
+              return d; })
+          .enter().append("rect")
+            .attr("x", function(d) { return x(d.data.year); })
+            .attr("y", function(d) { return y(d[1]); })
+            .attr("height", function(d) {return y(d[0]) - y(d[1]); })
+            .attr("width", 10)
+            .attr("opacity",.7)
+            .on("mouseover",function(d){
+                d3.select(this).attr("opacity",1)
+                var count = d[1]-d[0]
+                tooltip.text(count)          
+            })
+          .attr("transform", "translate(50," + 0 + ")")
+            
+            .style("cursor","pointer")
+            .on("mouseout", function() {
+                d3.select(this).attr("opacity",.7)
+                
+                tooltip.text("")          
+             })
+                .on("mousemove", function(d) {
+                  var xPosition = d3.mouse(this)[0] +5;
+                  var yPosition = d3.mouse(this)[1] -40;
+                  tooltip.style("left",xPosition+"px")
+                  tooltip.style("top",yPosition+"px")
+                  tooltip.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
+                //  tooltip.select("text").text(d[1]-d[0]);
+                });
+            
+        var tooltip = d3.select("#chart1").append("div").attr("id","tooltip")
+                .style("position","absolute")
+                .attr("class","d3-tip")
+                .style("width",15)
+                .style("height",15)
+            .html("")
+            .style("text-align","middle")
+            
+            console.log(x.domain())
+                
+        var xAxis = d3.axisBottom(x)
+                    .ticks(5)
+                    .tickFormat(d3.format("d"))
+        svg.append("g")
+          .attr("class", "axis axis--x")
+          .attr("transform", "translate(55," + height + ")")
+          .call(xAxis)  
+         
+        var yAxis = d3.axisLeft(y)
+                    .ticks(5)
+                    .tickFormat(d3.format("d"))
+                
+        svg.append("g")
+          .attr("class", "axis axis--x")
+          .attr("transform", "translate(55," + 0 + ")")
+          .call(yAxis)  
+               
+        
+    })
+
+</script>
+</body>
+</html>
