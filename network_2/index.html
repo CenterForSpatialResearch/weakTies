@@ -13,18 +13,24 @@
         border:1px solid black;
         cursor:pointer;
         border-radius:10px;
-        padding:5px;
+        padding:3px;
         width:120px;
-        margin:10px;
         text-align:center;
         background-color:black;
         color:white;
+        margin:10px;
+        margin-bottom:0px;
     }
     #buttons{
         right:0px;
         top:10px;
         position:absolute;
-        
+        width:160px;
+    }
+    p{
+        padding:10px;
+        padding-top:0px;
+        margin-top:2px;
     }
 </style>
 </head>
@@ -35,9 +41,12 @@
     <div id ="steps">Click on a node to see how many steps it takes to reach everyone</div>
     
     <div id="buttons">
-        <div id = "shortBridges" class="button">+ short bridges</div>
-        <div id = "mediumBridges" class="button">+ medium bridges</div>
-        <div id = "longBridges" class="button">+ long bridges</div>
+        <div id = "shortBridges" class="button">+ short link</div>
+        <p>short links connect 2 nodes that are 2 hops away from each other</p>
+        <div id = "mediumBridges" class="button">+ medium link</div>
+        <p>medium links connect 2 nodes that are 10 hops away from each other</p>
+        <div id = "longBridges" class="button">+ long link</div>
+        <p>long links connect 2 nodes that are at the corners and farthest from each other</p>
         <br>
         <div id = "randomSteps" class="button">+ random links</div>
     <div>
