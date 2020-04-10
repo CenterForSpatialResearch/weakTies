@@ -1,0 +1,174 @@
+
+    body{
+        font-family:helvetica;
+        font-size:11px;
+        letter-spacing:1px;
+        overflow:hidden;
+        margin:0px;
+    }
+    #highlight{
+        color:magenta;
+        font-weight:bold;
+    }
+    #density{
+        padding:40px;
+        padding-bottom:0px;
+        padding-top:0px;
+        font-size:18px;
+    }
+    #steps{
+        font-size:24px;
+        width:200px;
+        padding:40px;
+        position:absolute;
+    }
+    #title{
+        font-size:18px;
+        padding:20px;
+        padding-left:40px;
+        color:gold;
+    }
+    #setup{
+        float:top;
+        width:200px;
+        border:1px solid black;
+        padding:20px;
+    }
+    #friendCount{
+        float:top;
+        width:200px;
+        border:1px solid black;
+        padding:20px;
+    }
+    #friendshipTable{
+        float:top;
+        width:200px;
+        border:1px solid black;
+        padding:20px;
+    }
+    #tally{
+        float:top;
+        width:200px;
+        border:1px solid black;
+        padding:20px;
+    }
+    #chart1{
+        position:absolute;
+        top:100px;
+        left:0px;
+        z-index:-999;
+    }
+    #t{
+        width:250px;
+        visibility:hidden;
+    }
+    #info{
+        padding:5px;
+    }
+    #linksAddedInput{
+    }
+    #linkCount{
+        font-size:14px;
+        padding:10px;
+    }
+    .t_button{
+        display: inline-block;
+        border-right: 1px solid black;
+        padding:5px;
+    } 
+    .reset_button{
+        display: inline-block;
+        text-decoration:underline;
+    }
+    .sliderBox{
+        margin-right:10px;
+        display:inline-block;
+    }
+    .startstop{
+        width:100px;
+        padding:10px;
+        margin:5px;
+        border:1px solid #000000;
+        text-align:center;
+        border-radius:5px;
+    }
+    .slidecontainer{
+        display:inline-block;
+        padding:10px;
+    }
+    #randomTolerance{
+        color:#ec008c;
+    }
+    .slider {
+      -webkit-appearance: none;  /* Override default CSS styles */
+      appearance: none;
+      width: 150px; /* Full-width */
+      height: 20px; /* Specified height */
+      background: #ffffff; /* Grey background */
+      border:1px solid #000000;
+      outline: none; /* Remove outline */
+      opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+      -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+      transition: opacity .2s;
+    }
+    .sliderLinksAdded{
+        width: 50%; /* Full-width */
+        height: 20px; /* Specified height */
+    }
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none; /* Override default look */
+      appearance: none;
+      width: 40px; /* Set a specific slider handle width */
+      height: 20px; /* Slider handle height */
+      cursor: pointer; /* Cursor on hover */
+      background: url('slider_m.png');
+      border:none;
+    }
+ 
+    .slider::-moz-range-thumb {
+      width: 40px; /* Set a specific slider handle width */
+      height: 20px; /* Slider handle height */
+      cursor: pointer; /* Cursor on hover */
+      background: url('slider_m.png');
+      border:none;
+    }
+    input[type="range" i]{
+        color: red;
+    }
+    
+    #growthValue{
+        color:#ec008c;
+        font-size:25px;
+        line-height:20%;
+        padding:5px;
+        vertical-align:super;
+    }
+    #linksAddedValue{
+        color:#ec008c;
+        font-size:25px;
+        line-height:20%;
+        padding:5px;
+        vertical-align:super;
+    }
+    #hideTolerance{
+        width:300px;
+        height:70px;
+        background-color:rgba(255,255,255,.7);
+        position:absolute;
+        left:0px;
+        top:55px;
+        visibility:hidden;
+    }
+    #triadicInfo{
+        position:absolute;
+        right:0px;
+        top:0px;
+        padding:10px;
+        width:200px;
+    
+    }
+    #triadic{
+        border:1px solid black;
+        padding:5px;
+        width:180px;
+    }

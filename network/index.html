@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src="js/jquery.js"></script>
+    <script src="js/d3.v5.min.js"></script>
+      <link rel="stylesheet" href="style.css">
+
+
+</head>
+<body>
+   <div id="all">
+       <div id="title">Weak Ties Test 1</div>
+       <div id ="info">
+          </div>
+   
+        
+    <div id="chart1"></div>
+    <div id="density">DENSITY:</div>
+    
+    <div id="linkCount"></div>
+    <div id="hideTolerance"></div>
+    
+<script type="text/javascript"> 
+d3.select("#t_1").style("text-decoration","underline").style("color","#ec008c")  
+var triadicMode = false
+d3.select("#triadic")
+    .style("cursor","pointer")
+    .on("click",function(){ 
+        if(triadicMode==true){
+            triadicMode=false
+            d3.select("#triadic").style("font-weight","normal").html("Triadic Closure*: OFF<br/><br/>")
+            d3.select("#hideTolerance").style("visibility","hidden")
+        }else{
+            triadicMode=true 
+            d3.select("#triadic").style("font-weight","bold").html("Triadic Closure*: ON<br/><br/>")
+            d3.select("#hideTolerance").style("visibility","visible")
+        }
+    })
+        
+var svg = d3.select("#chart1").append("svg")
+   // .attr("width",window.innerWidth)
+    .attr("width",window.innerWidth)
+    .attr("height",window.innerHeight)
+var width = +svg.attr("width")
+var height = +svg.attr("height")
+
+var strengthScale = d3.scaleLinear().domain([375,1000]).range([-100,-800])
+var distance = 100
+var strength = -200//strengthScale(width)
+
+var groups = 20
+var groupSize = 6
+var size = groups*groupSize
+        
+var possibleLinks= (size*(size-1))/2
+var actualLinks = (groupSize*(groupSize-1))/2*groups+groups*(groups-1)/2
+
+var friendsToMake = actualLinks/size
+
+
+var density = Math.round(actualLinks/possibleLinks*100)/100
+    
+var densityDisplay = "Possible Links: "+possibleLinks+"<br>Actual Links: "+actualLinks+"<br>Density: "+density
+d3.select("#density").html(densityDisplay)
+
+var thresholdStart = 1//Math.random()//.8//var thresholdStart = parseInt(document.getElementById("startingInput").value)/100;
+d3.select("#randomTolerance").html(thresholdStart.toFixed(2))
+
+var threshold =1//parseInt(document.getElementById("growthInput").value)/100;
+    
+var groups = 2
+    
+//var newFriendships =100
+
+var interval = 5
+
+var nodes = []
+var links = []
+
+//makeWeakLinkData()
+makeNetworkData()
+
+d3.select("#setup").html("SETUP<br>size: "+size+"<br>friends each: "+friendsToMake+"<br>"+"start tolerance: "+thresholdStart
+    +"<br>tolerance: "+threshold)
+  
+var groupColor = {
+  //  _0:"#00aeef",
+  //  _1:"#00aeef",
+  //  _2:"#00aeef",
+  //  _3:"#00aeef",
+  //  _4:"#00aeef",
+  //  _5:"#00aeef",
+  //  _6:"#00aeef",
+  //  _7:"#00aeef"
+}
+var nodeRadius = 8
+var strokeColor = "#000000"
+var strokeWidth = 2
+
+function makeWeakLinkData(){
+    nodes =[]
+    links =[]
+    var groups = size/groupSize
+
+    var totalLinks = groupSize*(groupSize-1)/2*groups
+    
+    for(var i = 0; i<size; i++){
+        var groupNumber ="_"+Math.round(Math.random()*(groups-1))    
+        nodes.push({id:"node_"+i,group:groupNumber})
+    }
+    
+    var linksTracker = []
+    for(var n in nodes){
+        for(var k in nodes){
+            var nid = parseInt(nodes[n].id.replace("node_",""))
+            var kid = parseInt(nodes[k].id.replace("node_",""))
+            
+            if(nid%groups==kid%groups && nodes[n]!=nodes[k] ){
+                
+                if(nid>kid){
+                    var link = {source:nodes[k], target:nodes[n]}
+                }else{
+                    var link = {source:nodes[n], target:nodes[k]}
+                }
+                
+                var currentLinkIds = link.source.id+"_"+link.target.id
+            
+                if(linksTracker.indexOf(currentLinkIds)==-1){
+                    links.push(link)
+                    linksTracker.push(currentLinkIds)
+                }
+                
+            }
+          } 
+    }
+    
+    for(var j in nodes){
+        for(var l in nodes){
+            var jid = parseInt(nodes[j].id.replace("node_",""))
+            var lid = parseInt(nodes[l].id.replace("node_",""))
+            
+            if(Math.floor(jid/groups)==0 && Math.floor(lid/groups)==0 && lid!=jid){
+                if(jid>lid){
+                    var link = {source:nodes[l], target:nodes[j]}
+                }else{
+                    var link = {source:nodes[j], target:nodes[l]}
+                }
+                var currentLinkIds = link.source.id+"_"+link.target.id                
+                if(linksTracker.indexOf(currentLinkIds)==-1){
+                    links.push(link)
+                    linksTracker.push(currentLinkIds)
+                }
+            }
+        }
+    }
+    console.log(links.length)
+}
+
+
+function makeNetworkData(){
+    
+    nodes =[]
+    links =[]
+    
+    for(var i = 0; i<size; i++){
+        var groupNumber ="_"+Math.round(Math.random()*(groups-1))    
+        nodes.push({id:"node_"+i,group:groupNumber})
+    }
+    var linksTracker = []
+    
+    
+    
+    var existingFriends = 0
+
+    while(links.length<actualLinks){
+
+            var randomIndex = Math.round(Math.random()*(nodes.length-1))
+            var randomIndex2 = Math.round(Math.random()*(nodes.length-1))
+        while(randomIndex==randomIndex2){
+            randomIndex2 = Math.round(Math.random()*(nodes.length-1))
+        }
+            if(randomIndex<randomIndex2){
+                var source = nodes[randomIndex]
+                var target = nodes[randomIndex2]
+            }else{
+                var source = nodes[randomIndex2]
+                var target = nodes[randomIndex]
+            }
+            
+            
+            while(source.id == target.id){
+                var randomIndex = Math.round(Math.random()*(nodes.length-1))
+                var target = nodes[randomIndex]
+            }
+            
+            var link = {source:source, target:target}
+            var currentLinkIds = link.source.id+"_"+link.target.id                
+            
+            if(linksTracker.indexOf(currentLinkIds)==-1){
+                links.push(link)
+                linksTracker.push(currentLinkIds)
+                existingFriends+=1
+            }
+        }
+    console.log(links.length)
+        
+    }
+
+function ticked() {
+    
+  node.attr("cx", function(d) { return d.x; })
+      .attr("cy", function(d) { return d.y; })
+
+  link.attr("x1", function(d) { return d.source.x; })
+      .attr("y1", function(d) { return d.source.y; })
+      .attr("x2", function(d) { return d.target.x; })
+      .attr("y2", function(d) { return d.target.y; });
+} 
+//console.log(links)
+
+
+</script>
+<script src="run.js"></script>
+<script src="infect.js"></script>
+<!--
+<script src="input.js"></script>
+
+<script src="timeline.js"></script>
+-->
+
+</body>
+</html>
