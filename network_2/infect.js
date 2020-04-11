@@ -22,7 +22,6 @@ d3.selectAll(".networkCircle")
     d3.select(this).attr("fill","magenta")
             var x = parseFloat(d3.select("."+id).attr("cx"))
             var y = parseFloat(d3.select("."+id).attr("cy"))
-    console.log([x,y])
     d3.select("#chart1 svg").append("text").text("0").attr("x",x+nodeRadius).attr("y",y).attr("class","step")
     .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
    
@@ -34,12 +33,15 @@ function changeFriends(friends){
     for(var f in friends){
         if(oldFriends.indexOf(friends[f])==-1){
             oldFriends.push(friends[f])
-            console.log(friends[f])
             var x = d3.select("."+friends[f]).attr("cx")
             var y = d3.select("."+friends[f]).attr("cy")
-            console.log([x,y])
+            
         d3.select("#chart1 svg").append("text").text(colorIndex).attr("x",x+nodeRadius).attr("y",y-nodeRadius).attr("class","step")
         .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
+            .attr("opacity",0)
+            .transition()
+            .delay(colorIndex*100)
+            .attr("opacity",1)
             
             d3.select("."+friends[f]).transition().delay(colorIndex*100).attr("fill",cScale(colorIndex))
             var ff = getFriends(friends[f])
