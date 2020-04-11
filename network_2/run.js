@@ -44,7 +44,7 @@ var node = g.append("g")
           .attr("r", nodeRadius)
           .merge(node)
       .on("mouseover",function(d){
-          console.log(d)
+       //   console.log(d)
       })
           //.on("mouseover",function(d){
           //    d3.select(this).attr("fill",function(d){

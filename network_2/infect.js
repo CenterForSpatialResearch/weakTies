@@ -2,11 +2,13 @@ var delayInterval = 10
 var colorIndex = 1
 var oldFriends = []
 var cScale = d3.scaleLinear().domain([1,6,12]).range(["magenta","gold","cyan"])
-var sum = 0
+var distances = []
+
 d3.selectAll(".networkCircle")
 .attr("fill","#ffffff")
 .attr("cursor","pointer")
 .on('click',function(){
+    distances = []
     colorIndex = 1
     d3.selectAll(".networkCircle").attr('fill',"#ffffff")
     d3.selectAll(".link").attr('stroke',"#000000").attr("opacity",.2)
@@ -25,7 +27,48 @@ d3.selectAll(".networkCircle")
     d3.select("#chart1 svg").append("text").text("0").attr("x",x+nodeRadius).attr("y",y).attr("class","step")
     .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
    
+   console.log(distances)
+    var barWidth = 20
+    var height = 500
+    var width  = 500
+    d3.select("#chart2 svg").remove()
+    var svg = d3.select("#chart2").append("svg").attr("width",width).attr("height",height).append("g")
+    svg.selectAll("rect")
+    .data(distances)
+    .enter()
+    .append("rect")
+    .attr("x",function(d,i){return i*barWidth+barWidth})
+    .attr("y",function(d,i){return height-d.new*barWidth-barWidth*2})
+    .attr("width",barWidth-1)
+    .attr("height",function(d,i){return d.new*barWidth})
+    .attr("fill",function(d){return cScale(d.step)})
+    
+    svg.selectAll(".histoText")
+    .data(distances)
+    .enter()
+    .append("text")
+    .attr("x",function(d,i){return i*barWidth+barWidth*1.5})
+    .attr("y",function(d,i){return height-d.new*barWidth-barWidth*2})
+    .text(function(d,i){return d.new})
+    .attr("text-anchor","middle")
+    
+    svg.selectAll(".histoText")
+    .data(distances)
+    .enter()
+    .append("text")
+    .attr("x",function(d,i){return i*barWidth+barWidth*1.5})
+    .attr("y",function(d,i){return height-barWidth})
+    .text(function(d,i){return d.step})
+    .attr("text-anchor","middle")
+    
+    svg.append("text").text("number of steps").attr("x",barWidth).attr("y",height)
+    svg.append("text").text("number of nodes reached at step").attr("x",0).attr("y",height/2).style("writing-mode","vertical-rl")
+    
+    svg.attr("transform","translate(40,-40)")
 })
+function distanceHistogram(){
+    
+}
 function changeFriends(friends){
     d3.select("#steps").html("It takes <span id = \"highlight\">"+colorIndex+"</span> steps to reach everyone")
     
@@ -48,13 +91,17 @@ function changeFriends(friends){
             newFriends = newFriends.concat(ff)
         }
     }
-    colorIndex+=1
-    
-    newFriends = removeDups(newFriends)
-    sum+=newFriends.length
-    
+    newFriends = removeDups(newFriends)    
     oldFriends = removeDups(oldFriends)
-   // console.log([newFriends.length,oldFriends.length])
+    
+    if(colorIndex==1){
+        distances.push({step:colorIndex,new:oldFriends.length-1,old:oldFriends.length})
+    }else{
+        var lastCount = distances[distances.length-1].old
+        distances.push({step:colorIndex,new:oldFriends.length-lastCount,old:oldFriends.length})
+    }
+    
+    colorIndex+=1    
 
     if(oldFriends.length==nodes.length){
         return
