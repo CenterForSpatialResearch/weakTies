@@ -96,10 +96,12 @@ function updateDensity(){
     densityDisplay = "Nodes: "+nodes.length+"<br>Possible Links: "+possibleLinks+"<br>Actual Links: <span id = \"highlight\">"+actualLinks+"</span><br>Density: "+density
     d3.select("#density").html(densityDisplay)
 }   
+
     
 d3.select("#randomSteps").on("click",function(){
     d3.select("#steps").html("Click on a node to see how many steps it takes to reach everyone")
     d3.selectAll(".networkCircle").attr('fill',"#ffffff")
+    d3.selectAll(".step").remove()
     addRandomLinks(1)
     restart()
 })   
@@ -107,6 +109,7 @@ d3.select("#randomSteps").on("click",function(){
 d3.select("#shortBridges").on("click",function(){
     d3.select("#steps").html("Click on a node to see how many steps it takes to reach everyone")
     d3.selectAll(".networkCircle").attr('fill',"#ffffff")
+    d3.selectAll(".step").remove()
     addShortBridges(1)
     updateDensity()
     restart()
@@ -114,6 +117,7 @@ d3.select("#shortBridges").on("click",function(){
 d3.select("#mediumBridges").on("click",function(){
     d3.select("#steps").html("Click on a node to see how many steps it takes to reach everyone")
     d3.selectAll(".networkCircle").attr('fill',"#ffffff")
+    d3.selectAll(".step").remove()
     addMediumBridges(10)
     updateDensity()
     restart()
@@ -123,6 +127,7 @@ var longBridgeCounter = 0
 d3.select("#longBridges").on("click",function(){
     d3.select("#steps").html("Click on a node to see how many steps it takes to reach everyone")
     d3.selectAll(".networkCircle").attr('fill',"#ffffff")
+    d3.selectAll(".step").remove()
     addLongBridges()
     updateDensity()
     restart()
