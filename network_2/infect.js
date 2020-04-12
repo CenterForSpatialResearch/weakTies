@@ -20,16 +20,23 @@ d3.selectAll(".networkCircle")
     oldFriends = [id]
     var friends = getFriends(id)
     changeFriends(friends)
-    
-    d3.select(this).attr("fill","magenta")
-            var x = parseFloat(d3.select("."+id).attr("cx"))
-            var y = parseFloat(d3.select("."+id).attr("cy"))
-    d3.select("#chart1 svg").append("text").text("0").attr("x",x+nodeRadius).attr("y",y).attr("class","step")
+    var x = parseFloat(d3.select("."+id).attr("cx"))
+    var y = parseFloat(d3.select("."+id).attr("cy"))
+    d3.select("#chart1 svg").append("text").text("0").attr("x",x+nodeRadius).attr("y",y-nodeRadius).attr("class","step")
     .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
-   
-   console.log(distances)
-    var barWidth = 20
-    var height = 500
+    d3.select(this).attr("fill","magenta")
+   distanceHistogram(id)
+})
+
+function getDistances(friends){
+    
+}
+
+function distanceHistogram(id){
+    var x = parseFloat(d3.select("."+id).attr("cx"))
+    var y = parseFloat(d3.select("."+id).attr("cy"))
+    var barWidth = 15
+    var height = 700
     var width  = 500
     d3.select("#chart2 svg").remove()
     var svg = d3.select("#chart2").append("svg").attr("width",width).attr("height",height).append("g")
@@ -65,9 +72,6 @@ d3.selectAll(".networkCircle")
     svg.append("text").text("number of nodes reached at step").attr("x",0).attr("y",height/2).style("writing-mode","vertical-rl")
     
     svg.attr("transform","translate(40,-40)")
-})
-function distanceHistogram(){
-    
 }
 function changeFriends(friends){
     d3.select("#steps").html("It takes <span id = \"highlight\">"+colorIndex+"</span> steps to reach everyone")
@@ -112,7 +116,6 @@ function changeFriends(friends){
     //get new friends
     //stop only when friends.length is == nodes.length
 }
-
 
 function removeDups(friends){
     var noDup = []
