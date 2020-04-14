@@ -46,16 +46,18 @@
     <div id="density"></div>
     <div id ="steps">Click on a node to see how many steps it takes to reach everyone</div>
     
+    <!--
     <div id="buttons">
-        <div id = "shortBridges" class="button">+ short link</div>
-        <p>short links connect 2 nodes that are 2 hops away from each other</p>
-        <div id = "mediumBridges" class="button">+ medium link</div>
-        <p>medium links connect 2 nodes that are 10 hops away from each other</p>
-        <div id = "longBridges" class="button">+ long link</div>
-        <p>long links connect 2 nodes that are at the corners and farthest from each other</p>
-        <br>
-        <div id = "randomSteps" class="button">+ random links</div>
-    <div>
+            <div id = "shortBridges" class="button">+ short link</div>
+            <p>short links connect 2 nodes that are 2 hops away from each other</p>
+            <div id = "mediumBridges" class="button">+ medium link</div>
+            <p>medium links connect 2 nodes that are 10 hops away from each other</p>
+            <div id = "longBridges" class="button">+ long link</div>
+            <p>long links connect 2 nodes that are at the corners and farthest from each other</p>
+            <br>
+            <div id = "randomSteps" class="button">+ random links</div>
+        <div>-->
+    
 <!--
     <div id = "undo" class="button">undo last</div>
 -->
@@ -84,8 +86,8 @@ var nodes = []
 var links = []
 
 //makeWeakLinkData()
-makeNetworkData()
-//makeLatticeData()
+//makeNetworkData()
+makeLatticeData()
 var actualLinks = links.length
 var startLinks = links.length
 var density = Math.round(actualLinks/possibleLinks*100)/100
@@ -411,14 +413,14 @@ function layoutNodes(){
 	for(var i in nodes){
 		if(i%groupSize==0){
 			groupTracker+=1
-			var rx = Math.random()*width/2
-			var ry = Math.random()*height/2
+			var rx = Math.random()*width*.5
+			var ry = Math.random()*height*.5+height*.2
 			var spacex = Math.random()*30
 			var spacey = Math.random()*40
 		}
 		
-		var x = i%groupSize*spacex+rx+width/4
-		var y = i%groupSize*spacing+ry+height/4
+		var x = i%groupSize*spacex+rx
+		var y = i%groupSize*spacing+ry
 		
 		nodes[i]["x"]=x
 		nodes[i]["y"]=y
@@ -451,9 +453,10 @@ function drawStaticLinks(){
 	
 	for(var i in links){
 		var link = links[i]
-		var points =[[link.source.x,link.source.y],[link.target.x,link.target.y]]		
-		
-	    const curve = d3.line().curve(d3.curveNatural);
+		var points =[[link.source.x,link.source.y],[width/2,height/2+i%5],[link.target.x,link.target.y]]		
+		//http://bl.ocks.org/d3indepth/b6d4845973089bc1012dec1674d3aff8
+	  //  const curve = d3.line().curve(d3.curveBasis);
+	    const curve = d3.line().curve(d3.curveStep);
 		var svg = d3.select("#chart1 svg")
 		
 	  svg
