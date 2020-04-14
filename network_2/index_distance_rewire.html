@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src="js/jquery.js"></script>
+    <script src="js/d3.v5.min.js"></script>
+      <link rel="stylesheet" href="style.css">
+
+<style>
+    .button{
+        border:1px solid magenta;
+        cursor:pointer;
+        border-radius:10px;
+        padding:3px;
+        width:200px;
+        text-align:center;
+        background-color:magenta;
+        color:white;
+        margin:10px;
+        margin-bottom:0px;
+		font-size:24px;
+    }
+    #buttons{
+        right:0px;
+        top:10px;
+        position:absolute;
+        width:240px;
+    }
+    p{
+        padding:10px;
+        padding-top:0px;
+        margin-top:2px;
+    }
+    #chart2{
+        position:absolute;
+        bottom:10px;
+        left:10px;
+        color:magenta;
+    }
+    #prompt{
+        width:180px;
+        font-size:24px;
+        position:absolute;
+        right:240px;
+        top:0px;
+        padding:20px;
+        color:magenta;
+    }
+</style>
+</head>
+<body>
+    <div id="title">Weak Ties Test 3</div>
+    <div id="chart1"></div>
+    <div id="chart2">The length of all links between every node and everyother node<br></div>
+    <div id="density"></div>
+    <div id="prompt">Click on right to replace short links with longer ones</div>
+    <div id="buttons">
+      
+        <div id = "mediumBridges" class="button">replace with medium</div>
+        <p>medium links connect 2 nodes that are 10 hops away from each other</p>
+    <div>
+<!--
+    <div id = "undo" class="button">undo last</div>
+-->
+    
+<script type="text/javascript"> 
+
+var svg = d3.select("#chart1").append("svg")
+   // .attr("width",window.innerWidth)
+    .attr("width",window.innerWidth)
+    .attr("height",window.innerHeight)
+var width = +svg.attr("width")
+var height = +svg.attr("height")
+
+var strengthScale = d3.scaleLinear().domain([375,1000]).range([-100,-800])
+var distance = 2
+var strength = -10//strengthScale(width)
+
+var groups = 10
+var groupSize = 10
+var size = groups*groupSize
+        
+var possibleLinks= (size*(size-1))/2
+//var actualLinks = (groupSize*(groupSize-1))/2*groups+groups*(groups-1)/2
+var interval = 5
+var nodes = []
+var links = []
+
+//makeWeakLinkData()
+//makeNetworkData()
+makeLatticeData()
+var actualLinks = links.length
+var startLinks = links.length
+var density = Math.round(actualLinks/possibleLinks*100)/100
+var densityDisplay = "Nodes: "+nodes.length+"<br>Possible Links: "+possibleLinks+"<br>Actual Links: <span id = \"highlight\">"+actualLinks+"</span><br>Density: "+density
+d3.select("#density").html(densityDisplay)
+
+var nodeRadius = 4
+var strokeColor = "#000000"
+var strokeWidth = 2
+
+function updateDensity(){
+    actualLinks = links.length
+    density = Math.round(actualLinks/possibleLinks*100)/100
+    densityDisplay = "Nodes: "+nodes.length+"<br>Possible Links: "+possibleLinks+"<br>Actual Links: <span id = \"highlight\">"+actualLinks+"</span><br>Density: "+density
+    d3.select("#density").html(densityDisplay)
+}   
+
+    
+d3.select("#randomSteps").on("click",function(){
+    d3.select("#steps").html("Click on a node to see how many steps it takes to reach everyone")
+    d3.selectAll(".networkCircle").attr('fill',"#000000")
+    d3.selectAll(".step").remove()
+    addRandomLinks(1)
+    restart()
+    distanceHistogramAll()    
+})   
+
+  
+d3.select("#mediumBridges").on("click",function(){
+    d3.select("#steps").html("Click on a node to see how many steps it takes to reach everyone")
+    d3.selectAll(".networkCircle").attr('fill',"#000000")
+    d3.selectAll(".step").remove()
+    addMediumBridges(10)
+    updateDensity()
+    restart()
+    distanceHistogramAll()    
+}) 
+var longBridgeCounter = 0
+
+
+d3.select("#undo").on("click",function(){
+    links.pop()
+    updateDensity()
+    restart()
+})
+
+
+function makeLatticeData(){
+    var total = groups*groupSize
+    var columns = groups
+    
+    for(var i = 0; i<total; i++){
+        var groupNumber ="_"+Math.round(Math.random()*(groups-1))
+        var r = i%columns
+        var c = Math.floor(i/columns)
+        nodes.push({id:"node_"+i,group:groupNumber,row:r,column:c})
+    }
+    links = []
+    var linksTracker = []
+    for(var n in nodes){
+        for(var o in nodes){
+            var r1 = nodes[n].row
+            var c1 = nodes[n].column
+            var r2 = nodes[o].row
+            var c2 = nodes[o].column
+            var id1 = parseInt(nodes[n].id.replace("node_",""))
+            var id2 = parseInt(nodes[o].id.replace("node_",""))
+            
+            if(nodes[n].id != nodes[o].id){
+              //  console.log([r1,r2])
+                if(r1==r2){
+                    if(c1 == c2+1 || c1 == c2-1){
+                        if(id1<id2){
+                            var link = {source:nodes[n], target:nodes[o]}
+                        }else{
+                            var link = {source:nodes[o], target:nodes[n]}
+                        }
+                        var currentLinkIds = link.source.id+"_"+link.target.id
+                        if(linksTracker.indexOf(currentLinkIds)==-1){
+                            links.push(link)
+                            linksTracker.push(currentLinkIds)
+                        }
+                    }
+                }else if(c1==c2){
+                    if(r1 == r2+1 ||r1 == r2-1){
+                        if(id1<id2){
+                            var link = {source:nodes[n], target:nodes[o]}
+                        }else{
+                            var link = {source:nodes[o], target:nodes[n]}
+                        }
+                        var currentLinkIds = link.source.id+"_"+link.target.id
+                        if(linksTracker.indexOf(currentLinkIds)==-1){
+                            links.push(link)
+                            linksTracker.push(currentLinkIds)
+                        }
+                    }
+                }                
+            }
+        }
+    }
+   // console.log(links)
+    
+}
+
+
+//addRandomLinks(20)
+//addShortBridges()
+
+//addLongBridges(10)
+
+function addLongBridges(){
+    
+    if(longBridgeCounter%2==0){
+        var node1 = nodes[longBridgeCounter]
+       var node2 = nodes[nodes.length-1]
+        var link = {source:node1,target:node2}
+        links.push(link)
+    }else{
+        var node1 = nodes[groups-longBridgeCounter]
+        var node2 = nodes[nodes.length-groups]
+        var link = {source:node1,target:node2}
+    }
+    
+    links.push(link)
+    longBridgeCounter+=1
+    
+}
+
+
+function addMediumBridges(distance){
+    var index1 = Math.round(Math.random()*(nodes.length-1))
+    var node1 = nodes[index1]
+    var r1 = node1.row
+    var c1 = node1.column
+    
+	for(var l in links){
+		if(links[l].source == node1){
+			console.log("match")
+			console.log(l)
+			links.splice(l,1)
+		}
+	}
+	
+    var dx = Math.round(distance/2)
+    var dy = distance-dx
+    console.log([dx,dy,distance])
+    
+    if(r1+dx>9){
+        var r2 = r1-dx
+    }else{
+        var r2 = r1+dx
+    }
+    if(c1+dy>9){
+        var c2 = c1-dy
+    }else{
+        var c2 = c1+dy
+    }
+    
+    console.log(node1)
+    console.log([r2,c2])
+    
+    for(var n in nodes){
+        if(nodes[n].row==r2 && nodes[n].column==c2){
+            var link = {source:node1,target:nodes[n]}
+        }
+    }
+    links.push(link)
+}
+function addShortBridges(){
+    var node1 = nodes[Math.round(Math.random()*(nodes.length-1))]
+    var r1 = node1.row
+    var c1 = node1.column
+    
+    if(r1==9 || c1==9){
+        var r2 = r1-1
+        var c2 = c1-1
+    }else{
+        var r2 = r1+1
+        var c2 = c1+1
+    }
+    
+    console.log(node1)
+    for(var n in nodes){
+        if(nodes[n].row==r2 && nodes[n].column==c2){
+            var link = {source:node1,target:nodes[n]}
+        }
+    }
+    links.push(link)
+}
+
+
+function addRandomLinks(quantity){
+    var newLinks = []
+    while(newLinks.length<quantity){
+        var node1 = nodes[Math.round(Math.random()*(nodes.length-1))]
+            var node2 = nodes[Math.round(Math.random()*(nodes.length-1))]
+        var id1 = parseInt(node1.id.replace("node_",""))
+        var id2 = parseInt(node2.id.replace("node_",""))
+        if(id1!=id2){
+            if(id1<id2){
+                var link = {source:node1, target:node2}
+            }else{
+                var link = {source:node2, target:node1}
+            }
+        }
+        newLinks.push(link)
+    }
+    links = links.concat(newLinks)
+
+    updateDensity()
+}
+
+function makeWeakLinkData(){
+    nodes =[]
+    links =[]
+    var groups = size/groupSize
+
+    var totalLinks = groupSize*(groupSize-1)/2*groups
+    
+    for(var i = 0; i<size; i++){
+        var groupNumber ="_"+Math.round(Math.random()*(groups-1))    
+        nodes.push({id:"node_"+i,group:groupNumber})
+    }
+    
+    var linksTracker = []
+    for(var n in nodes){
+        for(var k in nodes){
+            var nid = parseInt(nodes[n].id.replace("node_",""))
+            var kid = parseInt(nodes[k].id.replace("node_",""))
+            
+            if(nid%groups==kid%groups && nodes[n]!=nodes[k] ){
+                
+                if(nid>kid){
+                    var link = {source:nodes[k], target:nodes[n]}
+                }else{
+                    var link = {source:nodes[n], target:nodes[k]}
+                }
+                
+                var currentLinkIds = link.source.id+"_"+link.target.id
+            
+                if(linksTracker.indexOf(currentLinkIds)==-1){
+                    links.push(link)
+                    linksTracker.push(currentLinkIds)
+                }
+                
+            }
+          } 
+    }
+    
+    for(var j in nodes){
+        for(var l in nodes){
+            var jid = parseInt(nodes[j].id.replace("node_",""))
+            var lid = parseInt(nodes[l].id.replace("node_",""))
+            
+            if(Math.floor(jid/groups)==0 && Math.floor(lid/groups)==0 && lid!=jid){
+                if(jid>lid){
+                    var link = {source:nodes[l], target:nodes[j]}
+                }else{
+                    var link = {source:nodes[j], target:nodes[l]}
+                }
+                var currentLinkIds = link.source.id+"_"+link.target.id                
+                if(linksTracker.indexOf(currentLinkIds)==-1){
+                    links.push(link)
+                    linksTracker.push(currentLinkIds)
+                }
+            }
+        }
+    }
+   // console.log(links.length)
+}
+function makeNetworkData(){
+    
+    nodes =[]
+    links =[]
+    
+    for(var i = 0; i<size; i++){
+        var groupNumber ="_"+Math.round(Math.random()*(groups-1))    
+        nodes.push({id:"node_"+i,group:groupNumber})
+    }
+    var linksTracker = []
+    
+    
+    
+    var existingFriends = 0
+
+    while(links.length<actualLinks){
+
+            var randomIndex = Math.round(Math.random()*(nodes.length-1))
+            var randomIndex2 = Math.round(Math.random()*(nodes.length-1))
+        while(randomIndex==randomIndex2){
+            randomIndex2 = Math.round(Math.random()*(nodes.length-1))
+        }
+            if(randomIndex<randomIndex2){
+                var source = nodes[randomIndex]
+                var target = nodes[randomIndex2]
+            }else{
+                var source = nodes[randomIndex2]
+                var target = nodes[randomIndex]
+            }
+            
+            
+            while(source.id == target.id){
+                var randomIndex = Math.round(Math.random()*(nodes.length-1))
+                var target = nodes[randomIndex]
+            }
+            
+            var link = {source:source, target:target}
+            var currentLinkIds = link.source.id+"_"+link.target.id                
+            
+            if(linksTracker.indexOf(currentLinkIds)==-1){
+                links.push(link)
+                linksTracker.push(currentLinkIds)
+                existingFriends+=1
+            }
+        }
+    console.log(links.length)
+        
+    }
+
+function ticked() {
+    
+  node.attr("cx", function(d) { return d.x; })
+      .attr("cy", function(d) { return d.y; })
+
+  link.attr("x1", function(d) { return d.source.x; })
+      .attr("y1", function(d) { return d.source.y; })
+      .attr("x2", function(d) { return d.target.x; })
+      .attr("y2", function(d) { return d.target.y; });
+} 
+//console.log(links)
+
+
+</script>
+<script src="run_small_rewire.js"></script>
+<script src="infect_distances.js"></script>
+<!--
+<script src="input.js"></script>
+
+<script src="timeline.js"></script>
+-->
+
+</body>
+</html>
